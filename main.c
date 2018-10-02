@@ -5,6 +5,8 @@
  * Created on August  2, 2018,  8:27 PM
  */
 
+#include "netmanager.h"
+#include "rtcp.h"
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,9 +20,11 @@
 int main(int argc, char *argv[]) {
 
     int sockfd;
-    char buffer[BUFFER_SIZE];
+    uint8_t buffer[BUFFER_SIZE];
 
     struct sockaddr_in servaddr, cliaddr;
+
+    NE_Init();
 
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd == -1) {
@@ -42,40 +46,32 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // Send to ARM device
-    struct sockaddr_in armaddr;
-    memset(&armaddr, 0, sizeof(armaddr));
-    armaddr.sin_family = AF_INET;
-    armaddr.sin_port   = htons(19000);
-    inet_aton("192.168.88.70", &armaddr.sin_addr);
-
-    // Send to ANDROID device
-    struct sockaddr_in androidaddr;
-    memset(&androidaddr, 0, sizeof(androidaddr));
-    androidaddr.sin_family = AF_INET;
-    androidaddr.sin_port   = htons(19000);
-    inet_aton("192.168.88.61", &androidaddr.sin_addr);
-
+    char cname[32];
 
     while (1) {
 
-        int len, n;
+        socklen_t len, n;
 
-        n = recvfrom(sockfd, (char *)buffer, BUFFER_SIZE, MSG_WAITALL,
+        bzero(buffer, BUFFER_SIZE);
+        n = recvfrom(sockfd, (uint8_t *)buffer, BUFFER_SIZE, MSG_WAITALL,
                      (struct sockaddr *)&cliaddr, &len);
 
-        if (cliaddr.sin_addr.s_addr != armaddr.sin_addr.s_addr) {
-
-            n = sendto(sockfd, (const char *)buffer, n, 0,
-                       (struct sockaddr *)&armaddr, sizeof(armaddr));
-
-        }else if(cliaddr.sin_addr.s_addr != androidaddr.sin_addr.s_addr){
-
-            n = sendto(sockfd, (const char *)buffer, n, 0,
-                       (struct sockaddr *)&androidaddr, sizeof(androidaddr));
-
+        if (RTCP_isSDES(buffer, n)) {
+            RTCP_readCNAME(cname, buffer);
+            NE_removeOlds();
+            if (!NE_exist(cname)) {
+                NE_put(cname, cliaddr);
+            } else {
+                NE_touch(cname);
+            }
         }
 
+        device_t *dscNE = NE_getDscNe(&cliaddr);
+        if (dscNE != NULL) {
+            n = sendto(sockfd, (const char *)buffer, n, 0,
+                       (struct sockaddr *)&dscNE->addr,
+                       sizeof(struct sockaddr_in));
+        }
     }
 
     return 0;
