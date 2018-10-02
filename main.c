@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in servaddr, cliaddr;
 
     NE_Init();
+    NE_initTableRoute();
 
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd == -1) {
@@ -60,8 +61,10 @@ int main(int argc, char *argv[]) {
             RTCP_readCNAME(cname, buffer);
             NE_removeOlds();
             if (!NE_exist(cname)) {
+                printf("Device %s new.\n", cname);
                 NE_put(cname, cliaddr);
             } else {
+                printf("Device %s keep alive.\n", cname);
                 NE_touch(cname);
             }
         }

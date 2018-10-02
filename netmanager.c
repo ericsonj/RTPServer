@@ -7,6 +7,7 @@
 
 #include "netmanager.h"
 #include "sys_time.h"
+#include <stdio.h>
 #include <string.h>
 
 #define NUM_ROUTES 10
@@ -68,6 +69,7 @@ void NE_removeOlds() {
         if (!devicesList[i].isFree) {
             long long int max_time = millis() - devicesList[i].time;
             if (max_time > MAX_TIME_REMOVE) {
+                printf("Device %s remove.\n", devicesList[i].key);
                 NE_remove(devicesList[i].key);
             }
         }
@@ -97,30 +99,31 @@ void NE_initTableRoute() {
 
     strcpy(routeTable[0].ne_a, "4568@ericsonj.net");
     strcpy(routeTable[0].ne_b, "1001@ericsonj.net");
+
+    strcpy(routeTable[1].ne_a, "1001@ericsonj.net");
+    strcpy(routeTable[1].ne_b, "4568@ericsonj.net");
 }
 
 rtp_route_t *NE_getRoute(char *KEY_ne_a) {
     for (int i = 0; i < NUM_ROUTES; ++i) {
-        if(strcmp(routeTable[i].ne_a, KEY_ne_a) == 0){
+        if (strcmp(routeTable[i].ne_a, KEY_ne_a) == 0) {
             return &routeTable[i];
         }
     }
     return NULL;
 }
 
-device_t *NE_getDscNe(struct sockaddr_in* addr){
+device_t *NE_getDscNe(struct sockaddr_in *addr) {
     for (int i = 0; i < NUM_DEVICES; i++) {
         if (devicesList[i].addr.sin_addr.s_addr == addr->sin_addr.s_addr) {
             rtp_route_t *route = NE_getRoute(devicesList[i].key);
-            if(route != NULL){
+            if (route != NULL) {
                 device_t *dscNE = NE_get(route->ne_b);
-                if(dscNE != NULL){
+                if (dscNE != NULL) {
                     return dscNE;
                 }
             }
         }
     }
     return NULL;
-
 }
-
