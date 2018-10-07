@@ -36,42 +36,44 @@ else
 Q=@
 endif
 
+all: size
+
 size: $(BUILD_DIR)/$(TARGET)	
-	@echo "SIZE\t" $(TARGET)
+	@echo -e "SIZE\t" $(TARGET)
 	@$(SIZE) $<
 
 $(BUILD_DIR)/$(TARGET): $(OBJS) 
 	$(Q)$(CTT) $(OBJS) -o $@ $(LDFLAGS)
-	@echo $(CTT)"\t" $@
+	@echo -e $(CTT)"\t" $@
 
 # assembly
 $(BUILD_DIR)/%.s.o: %.s
 	@$(MKDIR_P) $(dir $@)
 	$(Q)$(AS) $(ASFLAGS) -c $< -o $@
-	@echo "AS\t" $<
+	@echo -e "AS\t" $<
 
 $(BUILD_DIR)/%.S.o: %.S
 	@$(MKDIR_P) $(dir $@)
 	$(Q)$(ASS) $(ASFLAGS) -c $< -o $@
-	@echo "AS\t" $<
+	@echo -e "AS\t" $<
 
 # c source
 $(BUILD_DIR)/%.c.o: %.c
 	@$(MKDIR_P) $(dir $@)
 	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@ 
-	@echo "CC\t" $<
+	@echo -e "CC\t" $<
 
 # c++ source
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	@$(MKDIR_P) $(dir $@)
 	$(Q)$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-	@echo "CXX\t" $<
+	@echo -e "CXX\t" $<
 
 .PHONY: clean
 
 clean:
 	$(Q)rm -r $(BUILD_DIR)
-	@echo RM $(BUILD_DIR)
+	@echo -e "RM\t" $(BUILD_DIR)
 
 -include $(DEPS)
 
