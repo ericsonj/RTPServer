@@ -7,6 +7,7 @@
 
 #include "netmanager.h"
 #include "rtcp.h"
+#include "sys_time.h"
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,20 +61,26 @@ int main(int argc, char *argv[]) {
         if (RTCP_isSDES(buffer, n)) {
             RTCP_readCNAME(cname, buffer);
             NE_removeOlds();
+            char *ip       = inet_ntoa(cliaddr.sin_addr);
+            char *dateTime = getFormatTime();
             if (!NE_exist(cname)) {
-                printf("Device %s new.\n", cname);
+                printf("%s\t%s\t%s:%d\tNEW.\n", dateTime, cname, ip,
+                       cliaddr.sin_port);
                 NE_put(cname, cliaddr);
             } else {
-                printf("Device %s keep alive.\n", cname);
-                NE_touch(cname);
+                printf("%s\t%s\t%s:%d\tKEEP-ALIVE.\n", dateTime, cname, ip,
+                       cliaddr.sin_port);
+                NE_touch(cname, cliaddr);
             }
-        }
-
-        device_t *dscNE = NE_getDscNe(&cliaddr);
-        if (dscNE != NULL) {
-            n = sendto(sockfd, (const char *)buffer, n, 0,
-                       (struct sockaddr *)&dscNE->addr,
-                       sizeof(struct sockaddr_in));
+        } else {
+            if (buffer[0] != 0) {
+                device_t *dscNE = NE_getDscNe(&cliaddr);
+                if (dscNE != NULL) {
+                    n = sendto(sockfd, (const char *)buffer, n, 0,
+                               (struct sockaddr *)&dscNE->addr,
+                               sizeof(struct sockaddr_in));
+                }
+            }
         }
     }
 

@@ -38,7 +38,7 @@ void NE_put(char *key, struct sockaddr_in addr);
 
 device_t *NE_get(char *key);
 
-void NE_touch(char *key);
+    void NE_touch(char *key, struct sockaddr_in addr);
 
 void NE_removeOlds();
 

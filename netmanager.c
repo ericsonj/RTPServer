@@ -12,7 +12,7 @@
 
 #define NUM_ROUTES 10
 #define NUM_DEVICES 10
-#define MAX_TIME_REMOVE 60000 // 60 deg
+#define MAX_TIME_REMOVE 60000 // 60 seg
 
 static device_t devicesList[NUM_DEVICES];
 static rtp_route_t routeTable[NUM_ROUTES];
@@ -56,10 +56,11 @@ device_t *NE_get(char *key) {
     return NULL;
 }
 
-void NE_touch(char *key) {
+void NE_touch(char *key, struct sockaddr_in addr) {
     for (int i = 0; i < NUM_DEVICES; i++) {
         if (strcmp(devicesList[i].key, key) == 0) {
             devicesList[i].time = millis();
+            devicesList[i].addr = addr;
         }
     }
 }
@@ -97,11 +98,11 @@ void NE_initTableRoute() {
         strcpy(routeTable[0].ne_b, "");
     }
 
-    strcpy(routeTable[0].ne_a, "4568@ericsonj.net");
+    strcpy(routeTable[0].ne_a, "1005@ericsonj.net");
     strcpy(routeTable[0].ne_b, "1001@ericsonj.net");
 
     strcpy(routeTable[1].ne_a, "1001@ericsonj.net");
-    strcpy(routeTable[1].ne_b, "4568@ericsonj.net");
+    strcpy(routeTable[1].ne_b, "1005@ericsonj.net");
 }
 
 rtp_route_t *NE_getRoute(char *KEY_ne_a) {
@@ -115,7 +116,8 @@ rtp_route_t *NE_getRoute(char *KEY_ne_a) {
 
 device_t *NE_getDscNe(struct sockaddr_in *addr) {
     for (int i = 0; i < NUM_DEVICES; i++) {
-        if (devicesList[i].addr.sin_addr.s_addr == addr->sin_addr.s_addr) {
+        if (devicesList[i].addr.sin_addr.s_addr == addr->sin_addr.s_addr &&
+            devicesList[i].addr.sin_port == addr->sin_port) {
             rtp_route_t *route = NE_getRoute(devicesList[i].key);
             if (route != NULL) {
                 device_t *dscNE = NE_get(route->ne_b);

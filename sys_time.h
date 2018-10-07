@@ -14,6 +14,8 @@ extern "C" {
 
 long long int millis();
 
+char *getFormatTime();
+
 #ifdef __cplusplus
 }
 #endif

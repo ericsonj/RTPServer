@@ -8,6 +8,9 @@
 #include "sys_time.h"
 #include <sys/time.h>
 #include <sys/timeb.h>
+#include <time.h>
+
+char formatTime[26];
 
 long long int millis(){
     struct timeb timer_msec;
@@ -19,6 +22,16 @@ long long int millis(){
         timestamp_msec = -1;
     }
     return timestamp_msec;
+}
+
+
+char * getFormatTime(){
+    time_t timer;
+    struct tm* tm_info;
+    time(&timer);
+    tm_info = localtime(&timer);
+    strftime(formatTime, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    return formatTime;
 }
 
 
