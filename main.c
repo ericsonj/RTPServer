@@ -66,10 +66,12 @@ int main(int argc, char *argv[]) {
             if (!NE_exist(cname)) {
                 printf("%s\t%s\t%s:%d\tNEW.\n", dateTime, cname, ip,
                        cliaddr.sin_port);
+                fflush(stdout);
                 NE_put(cname, cliaddr);
             } else {
                 printf("%s\t%s\t%s:%d\tKEEP-ALIVE.\n", dateTime, cname, ip,
                        cliaddr.sin_port);
+                fflush(stdout);
                 NE_touch(cname, cliaddr);
             }
         } else {
