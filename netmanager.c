@@ -116,19 +116,12 @@ void NE_initTableRoute() {
         printf("%s > %s\n", routeTable[i].ne_a, routeTable[i].ne_b);
         i++;
     }
+    fflush(stdout);
 
     fclose(fp);
     if(line){
         free(line);
     }
-
-    /*
-    strcpy(routeTable[0].ne_a, "1005@ericsonj.net");
-    strcpy(routeTable[0].ne_b, "1001@ericsonj.net");
-
-    strcpy(routeTable[1].ne_a, "1001@ericsonj.net");
-    strcpy(routeTable[1].ne_b, "1005@ericsonj.net");
-    */
 
 }
 
