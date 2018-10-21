@@ -1,3 +1,6 @@
 /build/
 *.pcapng
 *.log
+GPATH
+GRTAGS
+GTAGS

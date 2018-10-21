@@ -1,5 +1,5 @@
 # Project
-TARGET ?= udpEcho
+TARGET ?= RTPServer
 VERBOSE=n
 
 # Declaration of variables

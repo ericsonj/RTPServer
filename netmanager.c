@@ -9,6 +9,7 @@
 #include "sys_time.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define NUM_ROUTES 10
 #define NUM_DEVICES 10
@@ -98,11 +99,37 @@ void NE_initTableRoute() {
         strcpy(routeTable[0].ne_b, "");
     }
 
+    FILE *fp;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen("router_list.txt", "r");
+    if (fp == NULL) {
+        return;
+    }
+
+    int i = 0;
+    printf("Route table:\n");
+    while ((read = getline(&line, &len, fp)) != -1 && i < NUM_ROUTES) {
+        sscanf(line, "%s %s", routeTable[i].ne_a, routeTable[i].ne_b);
+        printf("%s > %s\n", routeTable[i].ne_a, routeTable[i].ne_b);
+        i++;
+    }
+
+    fclose(fp);
+    if(line){
+        free(line);
+    }
+
+    /*
     strcpy(routeTable[0].ne_a, "1005@ericsonj.net");
     strcpy(routeTable[0].ne_b, "1001@ericsonj.net");
 
     strcpy(routeTable[1].ne_a, "1001@ericsonj.net");
     strcpy(routeTable[1].ne_b, "1005@ericsonj.net");
+    */
+
 }
 
 rtp_route_t *NE_getRoute(char *KEY_ne_a) {
