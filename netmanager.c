@@ -11,8 +11,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define NUM_ROUTES 10
-#define NUM_DEVICES 10
+#define NUM_ROUTES 20
+#define NUM_DEVICES 20
 #define MAX_TIME_REMOVE 60000 // 60 seg
 
 static device_t devicesList[NUM_DEVICES];
@@ -95,8 +95,8 @@ void NE_remove(char *key) {
 void NE_initTableRoute() {
 
     for (int i = 0; i < NUM_ROUTES; ++i) {
-        strcpy(routeTable[0].ne_a, "");
-        strcpy(routeTable[0].ne_b, "");
+        strcpy(routeTable[i].ne_a, "");
+        strcpy(routeTable[i].ne_b, "");
     }
 
     FILE *fp;
